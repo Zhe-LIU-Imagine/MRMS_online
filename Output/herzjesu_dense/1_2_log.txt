@@ -1,0 +1,9 @@
+Method ID 0 N ratio 0.908984 N=1205.31 epipolar error= 0.650803
+Method ID 1 N ratio 0.495004 N=656.375 epipolar error= 0.355506
+Method ID 2 N ratio 0.915488 N=1213.94 epipolar error= 0.252899
+Method ID 3 N ratio 0.773096 N=1025.13 epipolar error= 0.212428
+
+method ID 0 R error 0.000744087 t error0.00194181 number 1205
+method ID 1 R error 0.000397095 t error0.00156146 number 656
+method ID 2 R error 0.000558225 t error0.00138193 number 1213
+method ID 3 R error 0.000405418 t error0.00156642 number 1025
