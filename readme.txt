@@ -9,7 +9,11 @@ Z,Liu; P.Monasse and R,Marlet. Match Selection and Refinement for Highly Accurat
   It is distributed under the BSD license (see the COPYING file).
 
 PERFORMANCE WARMING:
-  1. If you use openCV library, please download the last version from GitHub, for openCV of version earlier than 2.4, descriptors' orientation may be reversed! (Bug in openCV 2.3) An easy way to test is to process an image with its rotated projection.
+  1. It may be time consuming to run the whole test for a scene(eg. 7 pairs of image for 4 methods and 8 iterations).
+
+  2. If you use openCV library, please download the last version from GitHub, for openCV of version earlier than 2.4, descriptors' orientation may be reversed! (Bug in openCV 2.3) An easy way to test is to process an image with its rotated projection.
+
+
 
 INSTALLING
   This implementation is on C++ and depends on openCV and KVLD library, whose installation guild is available online. You will need Cmake 2.6 or later to compile the program.
@@ -21,10 +25,10 @@ FOLDERS:
   Input: some illustrating pairs of images with ground truth.
   Output: results of demos are sent here, including 
     (? means the image index)
-    * ?_?+1_log: details of test
-    * ?_?+1_trueP: ground truth information
-    * average_result: final result
-    * rotation info: position information
+    * ?_(?+1)_log: details of test
+    * ?_(?+1)_trueP: ground truth information
+    * average_result: final result for each method
+    * ?_(?+1)_rotation info: position information for this pair.
     
 APPLICATIONS
 
