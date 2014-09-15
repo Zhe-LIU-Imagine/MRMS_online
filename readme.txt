@@ -9,10 +9,9 @@ Z,Liu; P.Monasse and R,Marlet. Match Selection and Refinement for Highly Accurat
   It is distributed under the BSD license (see the COPYING file).
 
 PERFORMANCE WARMING:
-  1. It may be time consuming to run the whole test for a scene(eg. 7 pairs of image for 4 methods and 8 iterations).
+  1. It may be time consuming to run the whole test for a scene(eg. 7 pairs of image for 4 methods and 16 iterations). The result of the input data is already in the output folder.
 
-  2. If you use openCV library, please download the last version from GitHub, for openCV of version earlier than 2.4, descriptors' orientation may be reversed! (Bug in openCV 2.3) An easy way to test is to process an image with its rotated projection.
-
+  2. If you use openCV library, please use version later than 2.4, otherwise descriptors' orientation may be reversed! (Bug in openCV 2.3) An easy way to test is to process an image with its rotated projection.
 
 
 INSTALLING
@@ -32,7 +31,7 @@ FOLDERS:
     
 APPLICATIONS
 
-  The code contains the main applications (MRMS_comparison). It shows the result of comparison for RANSAC, Match Selection, Match Refinement and MR+MS.
+  The code contains the main applications (MRMS_comparison.cpp). It shows the result of comparison for RANSAC, Match Selection, Match Refinement and MR+MS.
 
 For more information, please contact zhe.liu@enpc.fr
 

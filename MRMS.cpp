@@ -30,7 +30,7 @@ the terms of the BSD license (see the COPYING file).
 	}
 	Database::Database(string path,int number){
 		size=number;
-		cout<<"importing "<<size<<" images"<<endl;
+		cout<<"Importing "<<size<<" images"<<endl;
 		keys.resize(size);
 		descriptors.resize(size);
 
@@ -762,22 +762,29 @@ void MatchSelection(const Image<float>& If1, const Image<float>& If2,
 		}
 		std::vector<std::vector<Pair>> lists(steps);
 		std::vector<float> indicators(steps,0);
-		//=============================generate protential results===================//
-		for(int j =0; j<steps;j++){
-			std::vector<Pair> Corrected(matchesSorted.begin(),matchesSorted.begin()+int(ratio[j]*matchesSorted.size()));
-			float scale= Corrected[Corrected.size()-1].weight*Corrected[Corrected.size()-1].weight;
-			l_c[j]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),	F1,F2,Corrected,homography,RBmethod,OPmethod);
-			mean_error(l_c[j],F1,F2,Corrected,l_e[j],l_N[j],OPmethod);
-			lists[j]=Corrected;
-			//============================robustness of the result=====================//
-			Criterion(l_c[j], If1.Width(),If1.Height(), F1,F2,Corrected, indicators[j]);
-			//cout<<l_e[j]<<" "<<l_N[j]<<" "<<indicators[j]<<" "<<l_c[j].thres<<endl;
-		}
-		float indica_max= *std::max_element(indicators.begin(),indicators.end());
-		float stable=60; 
 
-
+		//=============================generate protential models===================//
 		
+//#pragma omp parallel
+//		{	
+//			srand(int(time(NULL)) ^ (omp_get_thread_num()+1));
+//#pragma omp for
+
+			for(int j =0; j<steps;j++){
+				std::vector<Pair> submatches(matchesSorted.begin(),matchesSorted.begin()+int(ratio[j]*matchesSorted.size()));
+				//float scale= submatches[submatches.size()-1].weight*submatches[submatches.size()-1].weight;
+				l_c[j]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),	F1,F2,submatches,homography,RBmethod,OPmethod);
+				mean_error(l_c[j],F1,F2,submatches,l_e[j],l_N[j],OPmethod);
+				lists[j]=submatches;
+
+				Criterion(l_c[j], If1.Width(),If1.Height(), F1,F2,submatches, indicators[j]);//robustness of the result
+			}
+
+//		}
+		float indica_max= *std::max_element(indicators.begin(),indicators.end());//model stability criterion
+		
+		float stable=60; // a model with the second eigenvalue no less than 60 * largest second eigenvalue is ok for selection.
+
 
 		int initial=0;
 		int b_i=initial;

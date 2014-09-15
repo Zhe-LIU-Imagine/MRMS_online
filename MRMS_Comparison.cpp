@@ -275,6 +275,7 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 //========================================== plan test======================================================// 
 
 int main(int argc,char*argv[]) {
+	
 	int iterations=16;
 	string Path=std::string(THIS_SOURCE_DIR);
 	string src=Path+"/Input/herzjesu_dense/";
@@ -282,7 +283,17 @@ int main(int argc,char*argv[]) {
 
 	//==========we take a pair of strecha dataset as example.
 	bool have_groundtruth=true;
-	int numbers = 8;//number of images 
+	int numbers = 8;//number of images
+
+	cout<< "Warming: the comparison test is time consuming "<<endl
+		<<"1. Check if result is already in the output folder"<<endl
+		<<"2. In MRMS.cpp use '#pragma omp for' around the line 771 to accelerate "<<endl
+		<<"3. the test runs for setting : "<<endl
+		<< "       "<<numbers-1 << " image pairs "<<endl
+		<< "       "<< 4 <<" method as ORSA, MS, MR, MR+MS "<<endl
+		<< "       "<< iterations<< " iterations for each method" << endl
+		<<"==================================================="<<endl;
+
 	Database Strecha(src,numbers);
 
 	//==============================generate features===========================//
