@@ -51,9 +51,6 @@ numbers of kept matches for each method.
 */
 vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FCrit>>& crit, bool homography, int iterations, ofstream& msg){
 	crit.clear();
-	//const int items=5;//RANSAC-LS iterative//RANSAC_M-estimator//LO-RANSAC// MLESAC //ORSA
-	//int RBmethods[items]={1,1,2,3,0};
-	//int OPmethods[items]={1,2,1,4,1};
 
 	const int items=1;// only ORSA+ IRLS
 	int RBmethods[items]={0};
