@@ -289,7 +289,7 @@ int main(int argc,char*argv[]) {
 		<< "       "<<numbers-1 << " image pairs "<<endl
 		<< "       "<< 4 <<" method as ORSA, MS, MR, MR+MS "<<endl
 		<< "       "<< iterations<< " iterations for each method" << endl
-		<<"==================================================="<<endl;
+		<<"======================================================="<<endl;
 
 	Database Strecha(src,numbers);
 

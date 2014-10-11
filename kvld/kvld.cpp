@@ -335,7 +335,7 @@ float KVLD(const Image<float>& I1,const Image<float>& I2,
 		std::cout<<std::endl;
 
 		//=====================================================additional substep to complet the network among inliers================================//
-#ifdef COMPLET_NET
+#ifdef COMPLET_NET //time consuming
 		for (int it1=0; it1<size-1;it1++){
 			if (valide[it1]){
 				size_t a1=matches[it1].first, b1=matches[it1].second;
@@ -430,7 +430,7 @@ void writeResult(const std::string output,const std::vector<keypoint>& F1,const 
       std::cout<<"error while writing kvld_matches_score.txt"<<std::endl;
     
     for (std::vector<double>::const_iterator it=score.begin(); it!=score.end();it++){
-        filteredmatches<<*it<<std::endl;
+        kvldScore<<*it<<std::endl;
         
     }
    kvldScore.close();
