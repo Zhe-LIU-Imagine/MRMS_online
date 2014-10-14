@@ -273,14 +273,14 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 
 int main(int argc,char*argv[]) {
 	
-	int iterations=16;
+	//==========we take a pair of strecha dataset as example.
+	bool have_groundtruth=true; 
+	int numbers = 8;//number of images
+	int iterations=16;// number of iterations
+	
 	string Path=std::string(THIS_SOURCE_DIR);
 	string src=Path+"/Input/herzjesu_dense/";
 	string out=Path+"/Output/herzjesu_dense/";
-
-	//==========we take a pair of strecha dataset as example.
-	bool have_groundtruth=true;
-	int numbers = 8;//number of images
 
 	cout<< "Warming: the comparison test is time consuming "<<endl
 		<<"1. Check if result is already in the output folder"<<endl
