@@ -282,8 +282,11 @@ int main(int argc,char*argv[]) {
 	string src=Path+"/Input/herzjesu_dense/";
 	string out=Path+"/Output/herzjesu_dense/";
 
-	cout<< "Warming: the comparison test is time consuming "<<endl
-	    << "It has been developed under Windows, may have problems with other OS."<<endl
+	cout<< "Warming:"<<endl
+		<< "1.The comparison test is time consuming "<<endl
+	    << "2.It has been developed under Windows, may have problems with other OS."<<endl
+		<< "3.Under windows, please run with VS instead of using .exe file (reported SVD decomposition error using .exe file)"<<endl;
+	cout<< "Test information: "<<endl
 		<<"1. Check if result is already in the output folder"<<endl
 		<<"2. In MRMS.cpp use '#pragma omp for' around the line 771 to accelerate "<<endl
 		<<"3. the test runs for setting : "<<endl

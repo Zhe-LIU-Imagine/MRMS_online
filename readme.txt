@@ -12,6 +12,8 @@ PERFORMANCE WARMING:
   1. It may be time consuming to run the whole test for a scene(eg. 7 pairs of image for 4 methods and 16 iterations). The result of the input data is already in the output folder.
 
   2. If you use openCV library, please use version later than 2.4, otherwise descriptors' orientation may be reversed! (Bug in openCV 2.3) An easy way to test is to process an image with its rotated projection.
+  
+  3. Under windows OS with VS 2010, please run the program directly with VS 2010 instead of running .exe file, for SVD decomposition bugs with .exe for unknown reason.
 
 
 INSTALLING
