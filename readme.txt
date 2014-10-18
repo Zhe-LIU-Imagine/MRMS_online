@@ -13,8 +13,6 @@ PERFORMANCE WARMING:
 
   2. If you use openCV library, please use version later than 2.4, otherwise descriptors' orientation may be reversed! (Bug in openCV 2.3) An easy way to test is to process an image with its rotated projection.
   
-  3. Under windows OS with VS 2010, please run the program directly with VS 2010 instead of running .exe file, for SVD decomposition bugs with .exe for unknown reason.
-
 
 INSTALLING
   This implementation is on C++ and depends on openCV and KVLD library, whose installation guild is available online. You will need Cmake 2.6 or later to compile the program.
@@ -28,8 +26,8 @@ FOLDERS:
     (? means the image index)
     * ?_(?+1)_log: details of test
     * ?_(?+1)_trueP: ground truth information
-    * average_result: final result for each method
-    * ?_(?+1)_rotation info: position information for this pair.
+    * final_average_result: final result for each method
+    * rotation_info: Rotation information for tested pairs.
     
 APPLICATIONS
 
