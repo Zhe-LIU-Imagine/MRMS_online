@@ -49,7 +49,8 @@ Output:
 numbers of kept matches for each method.
 
 */
-vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FCrit>>& crit, bool homography, int iterations, ofstream& msg){
+vector<int> Comparing(const Database& data, int ind1, int ind2, 
+	vector<vector<FCrit>>& crit, bool homography, int iterations, ofstream& msg){
 	crit.clear();
 
 	const int items=1;// only ORSA+ IRLS
@@ -85,6 +86,11 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 	ImageChain chain1(data.I[ind1],spline);
 	ImageChain chain2(data.I[ind2],spline);
 
+//================================================================//
+
+
+
+
 	//===============================  KVLD method ==================================//
 	std::cout<<"VLD starts with "<<matches.size()<<" matches"<<std::endl;
 
@@ -113,7 +119,6 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 	f>>cat;
 
 	matchesPair.clear();
-	int total=0;
 	vector<int> result;
 
 	//==============================================learned vector filter==========================================//
@@ -125,59 +130,58 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 	
 	//=============================================end learn and sort vector==================================//
 	//======group 1: baseline using RANSAC methods=======//
-	for (int j=0;j<items;j++) {
-		crit.push_back(vector<FCrit>(iterations));
-		result.push_back(0);
-	}
+
 	for (int j=0;j<items;j++){	
+		vector<FCrit> subcrit(iterations); 
 		vector<float> mean_N(iterations,0);
 		vector<float> mean_e(iterations,0);
 #pragma omp parallel
 		{	
 			srand(int(time(NULL)) ^ (omp_get_thread_num()+1) );
-#pragma omp for schedule(dynamic,1)
+#pragma omp for 
 			for (int i=0; i<iterations;i++){
 
-				crit[total+j][i]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),
-					F1,F2,matchesFiltered,homography,RBmethods[j],OPmethods[j]);
-
-				mean_error(crit[total+j][i],F1,F2,matchesFiltered,mean_e[i],mean_N[i]);
+				subcrit[i]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(), F1,F2,
+					matchesFiltered,homography,RBmethods[j],OPmethods[j]);
+				mean_error(subcrit[i],F1,F2,matchesFiltered,mean_e[i],mean_N[i]);
 			}
 		}
 		float ave_N=std::accumulate(mean_N.begin(),mean_N.end(),0.0)/iterations;
 		float ave_e=std::accumulate(mean_e.begin(),mean_e.end(),0.0)/iterations;
-		cout<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		 msg<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		result[total+j]=ave_N;
+
+		cout<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		 msg<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+
+		result.push_back(ave_N);
+		  crit.push_back(subcrit);
 	}
-	total+=items;
 	cout<<endl;
 
+		
 	//======group 2: RANSAC + match selection=======//
-	for (int j=0;j<items;j++) {
-		crit.push_back(vector<FCrit>(iterations));
-		result.push_back(0);
-	}
+
 	for (int j=0;j<items;j++){
+		vector<FCrit> subcrit(iterations); 
 		vector<float> mean_N(iterations,0);
 		vector<float> mean_e(iterations,0);
-
-		#pragma omp parallel
+		
+#pragma omp parallel
 		{	
 			srand(int(time(NULL)) ^ (omp_get_thread_num()+1));
 #pragma omp for  schedule(dynamic,1)
 			for (int i=0; i<iterations;i++){
-				MatchSelection( If1, If2,	matchesFiltered, F1, F2, mean_e[i], mean_N[i], crit[total+j][i], homography,RBmethods[j],OPmethods[j]);
+				MatchSelection( If1, If2,	matchesFiltered, F1, F2, mean_e[i], mean_N[i], subcrit[i], homography,RBmethods[j],OPmethods[j]);
 			}
 		}
 		float ave_N=std::accumulate(mean_N.begin(),mean_N.end(),0.0)/iterations;
 		float ave_e=std::accumulate(mean_e.begin(),mean_e.end(),0.0)/iterations;
 
-		cout<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		 msg<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		result[total+j]=ave_N;
+		cout<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		 msg<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		
+		result.push_back(ave_N);
+		  crit.push_back(subcrit);
 	}
-	total+=items;
 	cout<<endl;
 
 	//=============================================correcting matches =========================================================//
@@ -206,17 +210,14 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 			+pow((Hlist[it](1,1)/aV - (Hlist[it](2,1)*aY)/(aV*aV)),2);
 		
 		double S=sqrt((a-c)*(a-c)+4*b*b)/(a+c); // J^tJ = |a b; b c| 
-		matchesFiltered[it].weight=0.3*error+4.26*S;
+		matchesFiltered[it].weight=0.3*error+42.6*S;
 	}
 
 	std::sort(matchesFiltered.begin(),matchesFiltered.end(),myrank);
 	
 	//======group 3: RANSAC + match refinement=======//
-	for (int j=0;j<items;j++) {
-		crit.push_back(vector<FCrit>(iterations));
-		result.push_back(0);
-	}
 	for (int j=0;j<items;j++){	
+		vector<FCrit> subcrit(iterations); 
 		vector<float> mean_N(iterations,0);
 		vector<float> mean_e(iterations,0);
 #pragma omp parallel
@@ -224,25 +225,23 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 			srand(int(time(NULL)) ^ (omp_get_thread_num()+1));
 #pragma omp for  schedule(dynamic,1)
 			for (int i=0; i<iterations;i++){
-				crit[total+j][i]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),F1,F2,matchesFiltered,homography,RBmethods[j],OPmethods[j]);
-				mean_error(crit[total+j][i],F1,F2,matchesFiltered,mean_e[i],mean_N[i]);
+				subcrit[i]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),F1,F2,matchesFiltered,homography,RBmethods[j],OPmethods[j]);
+				mean_error(subcrit[i],F1,F2,matchesFiltered,mean_e[i],mean_N[i]);
 			}
 		}
 		float ave_N=std::accumulate(mean_N.begin(),mean_N.end(),0.0)/iterations;
 		float ave_e=std::accumulate(mean_e.begin(),mean_e.end(),0.0)/iterations;
-		cout<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		 msg<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		result[total+j]=ave_N;
+		cout<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		 msg<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		
+		result.push_back(ave_N);
+		  crit.push_back(subcrit);
 	}
-	total+=items;
 	cout<<endl;
 	
     //======group 4: RANSAC + match refinement and match selection=======//
-		for (int j=0;j<items;j++) {
-		crit.push_back(vector<FCrit>(iterations));
-		result.push_back(0);
-	}
-	for (int j=0;j<items;j++){	
+	for (int j=0;j<items;j++){
+		vector<FCrit> subcrit(iterations); 
 		vector<float> mean_N(iterations,0);
 		vector<float> mean_e(iterations,0);
 #pragma omp parallel
@@ -250,17 +249,18 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 			srand(int(time(NULL)) ^ (omp_get_thread_num()+1));
 #pragma omp for  schedule(dynamic,1)
 			for (int i=0; i<iterations;i++){
-				MatchSelection(If1,  If2, matchesFiltered, F1, F2, mean_e[i], mean_N[i], crit[total+j][i], homography,RBmethods[j],OPmethods[j]);
+				MatchSelection(If1,  If2, matchesFiltered, F1, F2, mean_e[i], mean_N[i], subcrit[i], homography,RBmethods[j],OPmethods[j]);
 			}
 		}
 		float ave_N=std::accumulate(mean_N.begin(),mean_N.end(),0.0)/iterations;
 		float ave_e=std::accumulate(mean_e.begin(),mean_e.end(),0.0)/iterations;
-		cout<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		 msg<<"Method ID " <<total+j << " N ratio " <<float(ave_N)/matchesFiltered.size()<<" N="<<ave_N<<" epipolar error= "<<ave_e<<endl;
-		result[total+j]=ave_N;
+		cout<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		 msg<<"Method ID " <<crit.size()<< ", N ratio=" <<float(ave_N)/matchesFiltered.size()<<", N="<<ave_N<<", epipolar error="<<ave_e<<endl;
+		
+		result.push_back(ave_N);
+		  crit.push_back(subcrit);
 	}
-	total+=items;
-	cout<<endl;	
+	cout<<endl;
 
 	//=====================================================================//
 	 msg<<endl;
@@ -272,7 +272,6 @@ vector<int> Comparing(const Database& data, int ind1, int ind2, vector<vector<FC
 //========================================== plan test======================================================// 
 
 int main(int argc,char*argv[]) {
-	
 	//==========we take a pair of strecha dataset as example.
 	bool have_groundtruth=true; 
 	int numbers = 8;//number of images
@@ -284,8 +283,7 @@ int main(int argc,char*argv[]) {
 
 	cout<< "Warming:"<<endl
 		<< "1.The comparison test is time consuming "<<endl
-	    << "2.It has been developed under Windows, may have problems with other OS."<<endl
-		<< "3.Under windows, please run with VS instead of using .exe file (reported SVD decomposition error using .exe file)"<<endl;
+	    << "2.It has been developed under Windows, may have problems with other OS."<<endl;
 	cout<< "Test information: "<<endl
 		<<"1. Check if result is already in the output folder"<<endl
 		<<"2. In MRMS.cpp use '#pragma omp for' around the line 771 to accelerate "<<endl
@@ -359,14 +357,16 @@ int main(int argc,char*argv[]) {
 				cv::Mat ess1=Strecha.K[j].t()*fonda1*Strecha.K[i];
 				cv::Mat Winv1(3,3,cv::DataType<double>::type);
 				double* Wptr1=(double*) Winv1.data;
+				for (int it= 0; it< 9 ; it++) Wptr1[it]=0;
 				Wptr1[0*3+1]=1;  Wptr1[1*3]=-1; Wptr1[2*3+2]=1; 
 
 				//===SVD decomposition===//
-				cv::Mat S1, U1,Vt1,R1,Tx1;
-				cv::SVD::compute(ess1,S1,U1,Vt1);
+				cv::SVD svd(ess1,cv::SVD::MODIFY_A);
+				cv::Mat S1=svd.w, U1=svd.u,Vt1=svd.vt;
 				
+
 				//===estimate rotation===//
-				R1=U1*Winv1*Vt1;
+				cv::Mat R1=U1*(Winv1*Vt1);
 				if(cv::determinant(R1)<0) R1=-R1;
 				double* Rptr1=(double*) R1.data;
 
@@ -374,12 +374,13 @@ int main(int argc,char*argv[]) {
 					R1=U1*Winv1.t()*Vt1;
 					if(cv::determinant(R1)<0) {
 						R1=-R1;
-						Rptr1=(double*) R1.data;
 					}
 				}
+				Rptr1=(double*) R1.data;
+				
 				//==estimate translation==//
 				Wptr1[2*3+2]=0;
-				Tx1=-Vt1.t()*(Winv1*(-1))*Vt1;
+				cv::Mat Tx1=-Vt1.t()*(Winv1*(-1))*Vt1;
 				double* Txptr1=(double*) Tx1.data;
 				cv::Mat T1(3,1,cv::DataType<double>::type);
 
@@ -425,14 +426,13 @@ int main(int argc,char*argv[]) {
 		logfile.close();
 	}
 
-
 	ofstream resultfile(out+"final_average_result.txt");
 	for(int id=0;id<errorR[0].size();id++){
 		double eR=0;
 		double et=0;
 		for (int i =0; i<Strecha.size-1; i++){
 			int j= (i+1)%Strecha.size;
-			cout<<"==============test with paire "<<i<<" and "<<j<<" =========="<<endl;
+			//cout<<"==============test with paire "<<i<<" and "<<j<<" =========="<<endl;
 			std::stringstream f;
 			f<<i;
 			string index1;
@@ -463,5 +463,6 @@ int main(int argc,char*argv[]) {
 		info<<asin(sqrt(tR[0*3+1]*tR[0*3+1]+tR[0*3+2]*tR[0*3+2]+tR[1*3+2]*tR[1*3+2]))<<" ";
 	}
 	info.close();
+	
 	return 0;
 }

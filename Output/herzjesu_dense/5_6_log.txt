@@ -1,9 +1,9 @@
-Method ID 0 N ratio 0.931922 N=3414.56 epipolar error= 0.488386
-Method ID 1 N ratio 0.395299 N=1448.38 epipolar error= 0.197622
-Method ID 2 N ratio 0.927828 N=3399.56 epipolar error= 0.145749
-Method ID 3 N ratio 0.805796 N=2952.44 epipolar error= 0.122573
+Method ID 0, N ratio=0.933321, N=3419.69, epipolar error=0.492748
+Method ID 1, N ratio=0.407819, N=1494.25, epipolar error=0.197886
+Method ID 2, N ratio=0.929244, N=3404.75, epipolar error=0.147121
+Method ID 3, N ratio=0.793395, N=2907, epipolar error=0.12064
 
-method ID 0 R error 0.00108661 t error0.0111843 number 3414
-method ID 1 R error 0.000635937 t error0.00408899 number 1448
-method ID 2 R error 0.000936021 t error0.00629265 number 3399
-method ID 3 R error 0.000564176 t error0.00285138 number 2952
+method ID 0 R error 0.00105164 t error0.0115854 number 3419
+method ID 1 R error 0.000649906 t error0.00444431 number 1494
+method ID 2 R error 0.00103744 t error0.00742383 number 3404
+method ID 3 R error 0.000328749 t error0.00109988 number 2907

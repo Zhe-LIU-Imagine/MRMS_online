@@ -1,0 +1,4 @@
+method ID 0 R error 0.000770933 t error0.00692273
+method ID 1 R error 0.000479973 t error0.00465749
+method ID 2 R error 0.00047802 t error0.00281227
+method ID 3 R error 0.000360189 t error0.00204293

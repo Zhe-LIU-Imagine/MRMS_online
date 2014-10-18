@@ -206,33 +206,17 @@ static void display_stats(const std::vector<Match>& vec_matchings,
 template <typename T>
 static void rm_duplicates(T& m);
 
-bool ORSA(const std::vector<Match>& vec_matchings, int w1,int h1, int w2,int h2,
-          double& precision,
-		  libNumerics::matrix<double>& H, std::vector<size_t>& vec_inliers,bool homo, bool addnoise,bool clean,bool usedweight=false);
-
-
-FCrit Find_Model(const Image<float>& I1,const Image<float>& I2,
-	const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,
-			const std::vector<Pair>& matches,double& precision, bool homography, bool addnoise=false, bool clean=false,int method=0,std::vector<float>& weight=std::vector<float>());
-
-FCrit Find_Model(const int w1,const int h1,const int w2,const int h2,
-	const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,
-			const std::vector<Pair>& matches,double& precision, bool homography, bool addnoise=false, bool clean=false,int method=0,std::vector<float>& weight=std::vector<float>());
-
 FCrit Find_Model_comparison(const int w1,const int h1,const int w2,const int h2, const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,
 	const std::vector<Pair>& matches, bool homography, int RBmethod,int OPmethod);
 
 void  mean_error(const libNumerics::matrix<double>& H,const std::vector<Match>& vec_matchings ,const std::vector<size_t>& vec_inliers, float & e, float& cardinal);
+
 bool ORSA_selective(const std::vector<Match>& vec_matchings, int w1,int h1, int w2,int h2, double& precision,
           libNumerics::matrix<double>& H, std::vector<size_t>& vec_inliers,float& b_e, float& b_N, bool homo, int RBmethod,int OPmethod);
-FCrit Find_Model_selective(const int w1,const int h1,const int w2,const int h2,
-	const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,
-	const std::vector<Pair>& matches, float& b_e, float& b_N, bool homography, int RBmethod,int OPmethod);
 
-FCrit Find_Dynamique2(const int w1,const int h1,const int w2,const int h2, const std::vector<keypoint>& F1,const std::vector<keypoint>& F2, const std::vector<Pair>& matches, float& b_card, bool homography);
 //=============================IO interface, convertion of object types======================//
-
 std::ofstream& writeDetector(std::ofstream& out, const keypoint& vect);
+
 std::ifstream& readDetector(std::ifstream& in,keypoint& point);
 //======================================elemetuary operations================================//
 template <typename T>
@@ -249,6 +233,7 @@ inline float point_distance(const T& P1,const T& P2){//distance of points
 inline bool inside(int w, int h, int x,int y,double radios){
 	return (x-radios>=0 && y-radios>=0 && x+radios<w && y+radios<h);
 }
+
 //range from 0 to 2*PI
 inline bool anglefrom(const float& x, const float& y, float& angle){
 	if (x!=0)
@@ -269,6 +254,7 @@ inline bool anglefrom(const float& x, const float& y, float& angle){
 	assert(angle>=0 && angle<2*PI);
 	return true;
 }
+
 //range from 0 to PI
 inline double angle_difference(const double angle1, const double angle2){
 	double angle=angle1-angle2;
@@ -343,13 +329,8 @@ inline float consistent(const T& a1,const T& a2,const T& b1,const T& b2){
 	float d=std::min(d1_error/std::min(d1,point_distance(b1,b2)),d2_error/std::min(d2,point_distance(b1,b2)));
 	return d;
 }
+
 float getRange(const Image<float>& I,int a,const float p);
-
-void writeProfil(const IntegralImages& I,const keypoint& key, std::vector<float>& feat, int size=13,float dim=2.0f);
-
-void get_angle(const IntegralImages& I,const keypoint& key,double& dx,double & dy);
-
-void get_angle(const IntegralImages& I,const float x,const float y, float real_step,double& dx,double & dy);
 
 template <typename T>
 static void rm_duplicates(T& m) {
@@ -366,10 +347,7 @@ inline float get(const LWImage<float>& map,int spline,double i_x, double i_y){
   return out;
 	}
 
-void writeGrid(float x, float y,float scale,const libNumerics::matrix<double>& H1 , std::vector<double>& grid, int size, float dim);
-void writeProfilH(const LWImage<float>& I, const std::vector<double>& grid, std::vector<float>& feat, int size);
-void correctionH(const LWImage<float>& I1,const LWImage<float>& I2,
-  const libNumerics::matrix<double>& H1,const libNumerics::matrix<double>& H2, keypoint& key1,keypoint& key2,int size);
-void rander(const std::vector<float>& in,std::vector<float>& out);
-void writeProfil2(const LWImage<float>& I,const keypoint& key, std::vector<float>& feat, int size, float dim);
 
+void get_angle(const IntegralImages& I,const keypoint& key,double& dx,double & dy);
+
+void get_angle(const IntegralImages& I,const float x,const float y, float real_step,double& dx,double & dy);
