@@ -746,11 +746,12 @@ void  mean_error(const FCrit& crit, const std::vector<keypoint>& F1,const std::v
 }
 
 void MatchSelection(const Image<float>& If1, const Image<float>& If2,
-	const std::vector<Pair>& matchesSorted, const std::vector<keypoint>& F1,std::vector<keypoint>& F2,
+	const std::vector<Pair>& matchesSorted, const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,
 	float& b_e, float& b_N, FCrit& b_c, bool homography, int RBmethod,int OPmethod, float rate,bool second_check){
+
 		const size_t steps=13;
 		float ratio[steps]={0.4,0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0};
-		
+
 		vector<float> l_N(steps,0);
 		vector<float> l_e(steps,0);
 		vector<FCrit> l_c(steps);
@@ -763,35 +764,37 @@ void MatchSelection(const Image<float>& If1, const Image<float>& If2,
 		std::vector<std::vector<Pair>> lists(steps);
 		std::vector<float> indicators(steps,0);
 
-		//=============================generate protential models===================//
-		
-//#pragma omp parallel
-//		{	
-//			srand(int(time(NULL)) ^ (omp_get_thread_num()+1));
-//#pragma omp for
+	//=============================generate protential models===================//
+	
+#pragma omp parallel
+		{	
+			srand(int(time(NULL)) ^ (omp_get_thread_num()+1));
+#pragma omp for
 
 			for(int j =0; j<steps;j++){
-				std::vector<Pair> submatches(matchesSorted.begin(),matchesSorted.begin()+int(ratio[j]*matchesSorted.size()));
-				//float scale= submatches[submatches.size()-1].weight*submatches[submatches.size()-1].weight;
-				l_c[j]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),	F1,F2,submatches,homography,RBmethod,OPmethod);
-				mean_error(l_c[j],F1,F2,submatches,l_e[j],l_N[j],OPmethod);
-				lists[j]=submatches;
-
-				Criterion(l_c[j], If1.Width(),If1.Height(), F1,F2,submatches, indicators[j]);//robustness of the result
+				lists[j].assign(matchesSorted.begin(),matchesSorted.begin()+int(ratio[j]*matchesSorted.size()));
+				//std::vector<Pair> submatches(matchesSorted.begin(),matchesSorted.begin()+int(ratio[j]*matchesSorted.size()));
+				
+				l_c[j]=Find_Model_comparison(If1.Width(),If1.Height(),If2.Width(),If2.Height(),	F1,F2,lists[j],homography,RBmethod,OPmethod);
+				mean_error(l_c[j],F1,F2,lists[j],l_e[j],l_N[j],OPmethod);
+				Criterion(l_c[j], If1.Width(),If1.Height(), F1,F2,lists[j], indicators[j]);//robustness of the result
 			}
 
-//		}
+		}
 		float indica_max= *std::max_element(indicators.begin(),indicators.end());//model stability criterion
 		
 		float stable=60; // a model with the second eigenvalue no less than 60 * largest second eigenvalue is ok for selection.
-
+		
 
 		int initial=0;
 		int b_i=initial;
 		b_e=l_e[initial];
 		b_N=l_N[initial];
 		b_c=l_c[initial];
-		while((!_finite(b_e)|| b_e<=0||!_finite(b_N)||indicators[initial]*stable<indica_max)
+		while(
+			(!_finite(b_e)|| b_e<=0||!_finite(b_N)
+			||indicators[initial]*stable<indica_max
+			)
 			&& initial < steps-1){
 			initial++;
 			b_e=l_e[initial];

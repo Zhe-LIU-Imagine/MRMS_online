@@ -236,7 +236,7 @@ private:
 			   var+=F[i]*F[i];
 		   }
 		   var= sqrt(var/number);
-
+		   if (var==0) var=1;
 		   for (int i=0; i<number;i++){ 
 			   F[i]/=var;
 		   }
@@ -304,6 +304,6 @@ void  Criterion(const FCrit& crit, int w, int h,  const std::vector<keypoint>& F
 void  mean_error(const FCrit& crit, const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,const std::vector<Pair>& matches, float & e, float& cardinal,int OPmethod=0);
 
 void MatchSelection(const Image<float>& If1, const Image<float>& If2,
-	const std::vector<Pair>& matchesSorted, const std::vector<keypoint>& F1,std::vector<keypoint>& F2,
+	const std::vector<Pair>& matchesSorted, const std::vector<keypoint>& F1, const std::vector<keypoint>& F2,
 	float& b_e, float& b_N, FCrit& b_c, bool homography, int RBmethod=0,int OPmethod=0,  float rate=2,bool second_check=true);
 #endif
