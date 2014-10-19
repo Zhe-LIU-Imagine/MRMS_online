@@ -210,7 +210,7 @@ vector<int> Comparing(const Database& data, int ind1, int ind2,
 			+pow((Hlist[it](1,1)/aV - (Hlist[it](2,1)*aY)/(aV*aV)),2);
 		
 		double S=sqrt((a-c)*(a-c)+4*b*b)/(a+c); // J^tJ = |a b; b c| 
-		matchesFiltered[it].weight=0.3*error+42.6*S;
+		matchesFiltered[it].weight=0.3*error+4.26*S;
 	}
 
 	std::sort(matchesFiltered.begin(),matchesFiltered.end(),myrank);
