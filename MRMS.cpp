@@ -703,10 +703,10 @@ void  Criterion(const FCrit& crit, int w, int h,  const std::vector<keypoint>& F
 			*ptr++=1;
 		}
 	}
-	cv::PCA pca(mat,cv::noArray(),CV_CALIB_USE_INTRINSIC_GUESS);
+	cv::PCA pca(mat,cv::noArray(),CV_PCA_DATA_AS_ROW);
 	cv::Mat values= pca.eigenvalues;
 	double* vptr=(double*) values.data;
-	e=vptr[7];	
+	e=vptr[7];	// the second smallest eigenvalue 
 }
 
 void  mean_error(const FCrit& crit, const std::vector<keypoint>& F1,const std::vector<keypoint>& F2,const std::vector<Pair>& matches, float & e, float& cardinal,int OPmethod){
